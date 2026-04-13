@@ -34,11 +34,14 @@ function ProfileCard({ user }) {
       className="bg-white rounded-xl shadow-lg overflow-hidden w-72 hover:scale-105 hover:shadow-xl transition duration-300 cursor-pointer"
     >
       {/* Image */}
-      <img
-            src={user.image || "https://via.placeholder.com/300"}
-           alt={user.name}
-          className="w-full h-60 object-cover"
-        />
+     <img
+  src={user.image || "https://via.placeholder.com/300"}
+  alt={user.name}
+  className="w-full h-60 object-cover"
+  onError={(e) => {
+    e.target.src = "https://via.placeholder.com/300";
+  }}
+/>
 
       {/* Details */}
       <div className="p-4">

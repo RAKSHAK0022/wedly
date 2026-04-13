@@ -52,12 +52,15 @@ const handleSave = async () => {
       return;
     }
 
-    let imageUrl = image; // 🔥 THIS LINE IS IMPORTANT
+    if (!name || !city || !age) {
+      alert("Please fill all fields");
+      return;
+    }
 
-    // upload image
+    let imageUrl = image;
+
     if (file) {
       const storageRef = ref(storage, `profiles/${user.uid}`);
-
       const snapshot = await uploadBytes(storageRef, file);
       imageUrl = await getDownloadURL(snapshot.ref);
     }
@@ -66,23 +69,23 @@ const handleSave = async () => {
       doc(db, "users", user.uid),
       {
         name,
-        age: Number(age),
+        age: age === "" ? "" : Number(age),
         city,
         profession,
         gender,
         salary,
-        image: imageUrl, // ✅ now works
+        image: imageUrl,
         email: user.email,
       },
       { merge: true }
     );
 
-    alert("Saved");
+    alert("Profile Updated 🔥");
     navigate("/");
-    window.location.reload();
 
   } catch (err) {
     console.error(err);
+    alert(err.message);
   }
 };
 

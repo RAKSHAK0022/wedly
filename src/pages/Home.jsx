@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { onSnapshot, collection } from "firebase/firestore";
 
 function Home() {
   const [users, setUsers] = useState([]); // 🔥 real users
@@ -10,20 +11,20 @@ function Home() {
   const navigate = useNavigate();
 
   // 🔥 FETCH DATA FROM FIREBASE
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const querySnapshot = await getDocs(collection(db, "users"));
+ 
 
-      const userList = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+useEffect(() => {
+  const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
+    const userList = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
-      setUsers(userList);
-    };
+    setUsers(userList);
+  });
 
-    fetchUsers();
-  }, []);
+  return () => unsubscribe();
+}, []);
 
   // 🔥 FILTER
   const filteredUsers =
