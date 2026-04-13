@@ -49,33 +49,60 @@ const handleSave = async () => {
 
     const user = currentUser;
 
-if (!user) {
-  console.log("User is null ❌");
-  alert("User not loaded yet, wait 1 sec and try again");
-  return;
-}
+const handleSave = async () => {
+  try {
+    console.log("Button clicked");
+
+    const user = currentUser;
+
+    if (!user) {
+      alert("User not ready");
+      return;
+    }
+
+    // 🔥 validation
+    if (!name || !age || !city) {
+      alert("Please fill all fields");
+      return;
+    }
 
     let imageUrl = image;
 
-    // upload image if new selected
-    // upload image safely
-if (file) {
-  const storageRef = ref(storage, `profiles/${user.uid}`);
+    // 🔥 correct image upload
+    if (file) {
+      const storageRef = ref(storage, `profiles/${user.uid}`);
 
-  uploadBytes(storageRef, file)
-    .then(() => getDownloadURL(storageRef))
-    .then((url) => {
-      console.log("Image uploaded later:", url);
+      const snapshot = await uploadBytes(storageRef, file);
+      imageUrl = await getDownloadURL(snapshot.ref);
+    }
 
-      // 🔥 update image AFTER profile saved
-      setDoc(doc(db, "users", user.uid), {
-        image: url,
-      }, { merge: true });
-    })
-    .catch((err) => {
-      console.error("Image upload failed:", err);
-    });
-}
+    // 🔥 save to firestore
+    await setDoc(
+      doc(db, "users", user.uid),
+      {
+        name,
+        age: Number(age),
+        city,
+        profession,
+        gender,
+        salary,
+        image: imageUrl,
+        email: user.email,
+      },
+      { merge: true }
+    );
+
+    alert("Profile Updated 🔥");
+
+    // 🔥 force refresh
+    navigate("/");
+    window.location.reload();
+
+  } catch (err) {
+    console.error(err);
+    alert("Error: " + err.message);
+  }
+};
 
     await setDoc(
       doc(db, "users", user.uid),
