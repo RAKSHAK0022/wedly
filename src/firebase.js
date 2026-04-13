@@ -7,7 +7,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAiz9gWTZiYO3rHL2ozJOPj4zCYpuivhis",
   authDomain: "wedly-725cf.firebaseapp.com",
   projectId: "wedly-725cf",
-  storageBucket: "wedly-725cf.firebasestorage.app",
+  storageBucket: "wedly-725cf.appspot.com",
   messagingSenderId: "581222936902",
   appId: "1:581222936902:web:ff472afb1742c29b473547"
 };

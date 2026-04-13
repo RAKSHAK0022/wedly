@@ -94,9 +94,11 @@ function Home() {
       </h2>
 
       {/* CARDS */}
-      <div className="py-10 flex flex-wrap justify-center gap-8 px-6">
-        <div id="matches" className="py-10 flex flex-wrap ..."></div>
-        {filteredUsers.map((user) => (
+      <div
+  id="matches"
+  className="py-10 flex flex-wrap justify-center gap-8 px-6"
+>
+  {filteredUsers.map((user) => (
           <ProfileCard
             key={user.id}
             user={{ ...user, match: calculateMatch(user) }}

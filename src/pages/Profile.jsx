@@ -1,38 +1,37 @@
 import { useParams } from "react-router-dom";
-import users from "../data/users";
+import { useEffect, useState } from "react";
+import { db } from "../firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 function Profile() {
   const { id } = useParams();
+  const [user, setUser] = useState(null);
 
-  const user = users.find((u) => u.id === parseInt(id));
+  useEffect(() => {
+    const fetchUser = async () => {
+      const docRef = doc(db, "users", id);
+      const docSnap = await getDoc(docRef);
 
-  if (!user) return <h1>User not found</h1>;
+      if (docSnap.exists()) {
+        setUser(docSnap.data());
+      }
+    };
+
+    fetchUser();
+  }, [id]);
+
+  if (!user) return <h1>Loading...</h1>;
 
   return (
     <div className="p-10 text-center">
       <img
         src={user.image}
-        alt={user.name}
         className="w-40 h-40 mx-auto rounded-full"
       />
 
-      <h1 className="text-3xl font-bold mt-4">
-        {user.name}, {user.age}
-      </h1>
-
-      <p className="mt-2 text-gray-600">📍 {user.location}</p>
-      <p className="text-gray-600">💼 {user.profession}</p>
-
-      <button className="mt-6 bg-pink-600 text-white px-6 py-2 rounded-lg">
-        ❤️ Send Interest
-      </button>
-
-      <button
-  onClick={() => window.location.href = "/chat"}
-  className="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg"
->
-  💬 Start Chat
-</button>
+      <h1>{user.name}, {user.age}</h1>
+      <p>{user.city}</p>
+      <p>{user.profession}</p>
     </div>
   );
 }

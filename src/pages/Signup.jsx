@@ -9,7 +9,8 @@ function Signup() {
   const handleSignup = async () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      alert("Account Created 🔥");
+       alert("Account Created 🔥");
+        navigate("/login"); // 🔥 go to login page
     } catch (err) {
       alert(err.message);
     }

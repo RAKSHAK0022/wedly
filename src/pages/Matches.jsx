@@ -64,18 +64,14 @@ function Matches() {
               {matches.map((user, index) => (
   <div
     key={index}
-    className="border p-4 mb-3 rounded flex items-center gap-4 cursor-pointer hover:bg-gray-100"
     onClick={() => navigate(`/chat/${user.id}`)}
+    className="border p-4 mb-3 flex gap-4 cursor-pointer"
   >
-    <img
-      src={user.image || "https://via.placeholder.com/100"}
-      className="w-16 h-16 rounded-full object-cover"
-    />
+    <img src={user.image} className="w-16 h-16 rounded-full" />
 
     <div>
-      <p className="font-bold">{user.name}</p>
-      <p className="text-sm text-gray-500">{user.city}</p>
-      <p className="text-sm text-gray-500">💰 ₹{user.salary}</p>
+      <p>{user.name}</p>
+      <p>{user.city}</p>
     </div>
   </div>
 ))}
