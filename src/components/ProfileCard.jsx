@@ -35,11 +35,13 @@ function ProfileCard({ user }) {
     >
       {/* Image */}
      <img
-  src={user.image || "https://via.placeholder.com/300"}
-  alt={user.name}
+  src={user?.image || "https://via.placeholder.com/300"}
+  alt={user?.name}
   className="w-full h-60 object-cover"
   onError={(e) => {
-    e.target.src = "https://via.placeholder.com/300";
+    if (e?.target) {
+      e.target.src = "https://via.placeholder.com/300";
+    }
   }}
 />
 
