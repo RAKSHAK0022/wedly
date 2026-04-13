@@ -45,14 +45,6 @@ useEffect(() => {
 
 const handleSave = async () => {
   try {
-    console.log("Button clicked");
-
-    const user = currentUser;
-
-const handleSave = async () => {
-  try {
-    console.log("Button clicked");
-
     const user = currentUser;
 
     if (!user) {
@@ -60,15 +52,9 @@ const handleSave = async () => {
       return;
     }
 
-    // 🔥 validation
-    if (!name || !age || !city) {
-      alert("Please fill all fields");
-      return;
-    }
+    let imageUrl = image; // 🔥 THIS LINE IS IMPORTANT
 
-    let imageUrl = image;
-
-    // 🔥 correct image upload
+    // upload image
     if (file) {
       const storageRef = ref(storage, `profiles/${user.uid}`);
 
@@ -76,7 +62,6 @@ const handleSave = async () => {
       imageUrl = await getDownloadURL(snapshot.ref);
     }
 
-    // 🔥 save to firestore
     await setDoc(
       doc(db, "users", user.uid),
       {
@@ -86,45 +71,18 @@ const handleSave = async () => {
         profession,
         gender,
         salary,
-        image: imageUrl,
+        image: imageUrl, // ✅ now works
         email: user.email,
       },
       { merge: true }
     );
 
-    alert("Profile Updated 🔥");
-
-    // 🔥 force refresh
+    alert("Saved");
     navigate("/");
     window.location.reload();
 
   } catch (err) {
     console.error(err);
-    alert("Error: " + err.message);
-  }
-};
-
-    await setDoc(
-      doc(db, "users", user.uid),
-      {
-        name,
-        age,
-        city,
-        profession,
-        gender,
-        salary,
-        image: imageUrl,
-        email: user.email,
-      },
-      { merge: true }
-    );
-
-    alert("Profile Updated 🔥");
-    navigate("/");
-
-  } catch (err) {
-    console.error(err);
-    alert(err.message);
   }
 };
 
