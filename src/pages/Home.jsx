@@ -1,7 +1,6 @@
 import ProfileCard from "../components/ProfileCard";
 import { useState, useEffect } from "react";
 import { db } from "../firebase";
-import { collection, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { onSnapshot, collection } from "firebase/firestore";
 

@@ -36,12 +36,10 @@ function ProfileCard({ user }) {
       {/* Image */}
      <img
   src={user?.image || "https://via.placeholder.com/300"}
-  alt={user?.name}
+  alt={user?.name || "profile"}
   className="w-full h-60 object-cover"
   onError={(e) => {
-    if (e?.target) {
-      e.target.src = "https://via.placeholder.com/300";
-    }
+    e.target.src = "https://via.placeholder.com/300";
   }}
 />
 
