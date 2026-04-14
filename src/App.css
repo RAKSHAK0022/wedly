@@ -182,3 +182,19 @@
     border-right-color: var(--border);
   }
 }
+
+/* 🔥 Match Popup Animation */
+.animate-pop {
+  animation: pop 0.3s ease;
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

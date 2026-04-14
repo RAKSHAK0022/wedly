@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import { onSnapshot, collection } from "firebase/firestore";
+import SwipeCards from "../components/SwipeCards";
 
 function Home() {
   const [users, setUsers] = useState([]); // 🔥 real users
@@ -43,10 +44,10 @@ useEffect(() => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-pink-50 to-pink-100">
+    <div className="min-h-screen bg-gradient-to-r from-pink-100 via-rose-100 to-pink-200">
 
       {/* HERO */}
-      <div className="flex flex-col items-center justify-center text-center h-[90vh] px-6">
+      <div className="flex flex-col items-center justify-center text-center min-h-screen px-4 md:px-10">
         <h1 className="text-5xl md:text-6xl font-bold text-gray-800 leading-tight">
           Find Your Perfect <span className="text-pink-600">Life Partner</span> 💖
         </h1>
@@ -55,24 +56,43 @@ useEffect(() => {
           Wedly helps you discover meaningful connections.
         </p>
 
-        <div className="mt-8 flex gap-4">
-          <button
-        onClick={() => navigate("/create-profile")}
-           className="bg-pink-600 text-white px-6 py-3 rounded-lg"
-            >
-            Get Started
-                </button>
-          
+        <div className="mt-8 flex gap-4 flex-wrap justify-center">
 
-          <button
-  onClick={() =>
-    document.getElementById("matches").scrollIntoView({ behavior: "smooth" })
-  }
-  className="border border-pink-600 text-pink-600 px-6 py-3 rounded-lg"
->
-  Browse Matches
-</button>
-        </div>
+          <div className="text-center py-10">
+  <h2 className="text-3xl font-bold mb-6">Why Choose Wedly?</h2>
+
+  <div className="flex flex-col md:flex-row justify-center gap-6 text-lg">
+    <div className="bg-white px-6 py-4 rounded-xl shadow">
+      ✅ Verified Profiles
+    </div>
+
+    <div className="bg-white px-6 py-4 rounded-xl shadow">
+      🤖 AI-Based Matching
+    </div>
+
+    <div className="bg-white px-6 py-4 rounded-xl shadow">
+      🔐 Secure Platform
+    </div>
+  </div>
+</div>
+
+  <button
+    onClick={() => navigate("/create-profile")}
+    className="bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-lg shadow-md transition transform hover:scale-105"
+  >
+    Get Started
+  </button>
+
+  <button
+    onClick={() =>
+      document.getElementById("matches").scrollIntoView({ behavior: "smooth" })
+    }
+    className="border border-pink-600 text-pink-600 px-6 py-3 rounded-lg hover:bg-pink-100 transition transform hover:scale-105"
+  >
+    Browse Matches
+  </button>
+
+</div>
       </div>
 
       {/* FILTER */}
@@ -94,17 +114,9 @@ useEffect(() => {
       </h2>
 
       {/* CARDS */}
-      <div
-  id="matches"
-  className="py-10 flex flex-wrap justify-center gap-8 px-6"
->
-  {filteredUsers.map((user) => (
-          <ProfileCard
-            key={user.id}
-            user={{ ...user, match: calculateMatch(user) }}
-          />
-        ))}
-      </div>
+      <div id="matches">
+  <SwipeCards users={filteredUsers} />
+</div>
 
     </div>
   );
