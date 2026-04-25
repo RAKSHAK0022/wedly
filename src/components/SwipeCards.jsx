@@ -34,9 +34,9 @@ function SwipeCards({ users }) {
 
       if (likedUserData?.likes?.includes(currentUser.uid)) {
   setMatchUser({
-    name: likedUserData.name,
-    photo: likedUserData.photo,
-  });
+  name: likedUserData.name,
+  image: likedUserData.image,
+});
 }
 
     } catch (err) {
@@ -66,11 +66,11 @@ function SwipeCards({ users }) {
             <div className="absolute bg-white w-80 h-96 rounded-2xl shadow-lg overflow-hidden">
 
               <img
-                src={user.photo || "https://via.placeholder.com/300"}
-                alt=""
-                className="w-full h-64 object-cover"
-              />
-
+  src={user.image}
+  alt="profile"
+  className="w-full h-64 object-cover"
+/>
+              
               <div className="p-4">
                 <h2 className="text-xl font-bold">
                   {user.name}, {user.age}
@@ -110,7 +110,7 @@ function SwipeCards({ users }) {
       </p>
 
       <img
-  src={user.image}
+  src={matchUser.image}
   alt="profile"
   className="w-40 h-40 object-cover rounded-full"
 />

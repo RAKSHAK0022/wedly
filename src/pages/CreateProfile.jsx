@@ -79,6 +79,7 @@ const handleSave = async () => {
 
     alert("Profile Updated 🔥");
     navigate("/");
+   window.location.reload();
 
   } catch (err) {
     console.error(err);
