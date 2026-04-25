@@ -1,8 +1,7 @@
 
 import { db, auth } from "../firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
-import { storage } from "../firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { uploadImage } from "../uploadImage";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -59,11 +58,9 @@ const handleSave = async () => {
 
     let imageUrl = image;
 
-    if (file) {
-      const storageRef = ref(storage, `profiles/${user.uid}`);
-      const snapshot = await uploadBytes(storageRef, file);
-      imageUrl = await getDownloadURL(snapshot.ref);
-    }
+       if (file) {
+          imageUrl = await uploadImage(file);
+       }
 
     await setDoc(
       doc(db, "users", user.uid),
