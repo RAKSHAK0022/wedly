@@ -110,10 +110,10 @@ function SwipeCards({ users }) {
       </p>
 
       <img
-        src={matchUser.photo || "https://via.placeholder.com/150"}
-        alt=""
-        className="w-24 h-24 rounded-full mx-auto mt-4 object-cover"
-      />
+  src={user.image}
+  alt="profile"
+  className="w-40 h-40 object-cover rounded-full"
+/>
 
       <button
         onClick={() => setMatchUser(null)}
