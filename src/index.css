@@ -2,23 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* 🔥 Match Popup Animation */
+/* 🔥 MATCH POPUP ANIMATION (smoother + modern) */
 .animate-pop {
-  animation: pop 0.3s ease;
+  animation: pop 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes pop {
-  from {
-    transform: scale(0.7);
+  0% {
+    transform: scale(0.6);
     opacity: 0;
   }
-  to {
-    transform: scale(1);
+  70% {
+    transform: scale(1.05);
     opacity: 1;
   }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 🔥 SPIRAL ANIMATION (upgraded glow effect) */
+@keyframes spiralGlow {
+  0% {
+    transform: scale(0.5) rotate(0deg);
+    opacity: 0;
+    box-shadow: 0 0 0px rgba(255, 105, 180, 0.5);
+  }
+  50% {
+    transform: scale(1.3) rotate(180deg);
+    opacity: 0.9;
+    box-shadow: 0 0 20px rgba(255, 105, 180, 0.6);
+  }
+  100% {
+    transform: scale(2.2) rotate(360deg);
+    opacity: 0;
+    box-shadow: 0 0 40px rgba(255, 105, 180, 0);
+  }
+}
+
+.spiral {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 105, 180, 0.7);
+  animation: spiralGlow 1.6s ease-out infinite;
+  pointer-events: none; /* ✅ important (prevents click blocking) */
+}
+
+/* 🔥 OPTIONAL: DOUBLE RING EFFECT (premium look) */
+.spiral::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 182, 193, 0.5);
+  animation: spiralGlow 1.6s ease-out infinite;
+  animation-delay: 0.4s;
 }

@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
 import { db, auth } from "../firebase";
-import { collection, addDoc, query, orderBy, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  serverTimestamp,
+} from "firebase/firestore";
 import { useParams } from "react-router-dom";
 
 function Chat() {
@@ -10,37 +17,49 @@ function Chat() {
 
   const currentUser = auth.currentUser;
 
-  // 🔥 REAL-TIME LISTENER
+  // 🔥 Create unique chatId (IMPORTANT FIX)
+  const chatId =
+    currentUser && id
+      ? [currentUser.uid, id].sort().join("_")
+      : null;
+
+  // 🔥 REAL-TIME LISTENER (ONLY THIS CHAT)
   useEffect(() => {
-    const q = query(collection(db, "messages"), orderBy("timestamp"));
+    if (!chatId) return;
+
+    const q = query(
+      collection(db, "chats", chatId, "messages"),
+      orderBy("timestamp", "asc")
+    );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const msgs = snapshot.docs.map((doc) => doc.data());
+      const msgs = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-      const filtered = msgs.filter(
-        (m) =>
-          (m.sender === currentUser.uid && m.receiver === id) ||
-          (m.sender === id && m.receiver === currentUser.uid)
-      );
-
-      setMessages(filtered);
+      setMessages(msgs);
     });
 
-    return () => unsubscribe();
-  }, []);
+    return unsubscribe;
+  }, [chatId]);
 
   // 🔥 SEND MESSAGE
   const handleSend = async () => {
-    if (!message.trim()) return;
+    if (!message.trim() || !chatId) return;
 
-    await addDoc(collection(db, "messages"), {
-      sender: currentUser.uid,
-      receiver: id,
-      text: message,
-      timestamp: new Date(),
-    });
+    try {
+      await addDoc(collection(db, "chats", chatId, "messages"), {
+        sender: currentUser.uid,
+        receiver: id,
+        text: message,
+        timestamp: serverTimestamp(), // ✅ better than new Date()
+      });
 
-    setMessage("");
+      setMessage("");
+    } catch (err) {
+      console.error("Send error:", err);
+    }
   };
 
   return (
@@ -53,10 +72,10 @@ function Chat() {
 
       {/* MESSAGES */}
       <div className="flex-1 p-4 overflow-y-auto space-y-2 bg-gray-100">
-        {messages.map((msg, index) => (
+        {messages.map((msg) => (
           <div
-            key={index}
-            className={`p-2 rounded-lg w-fit ${
+            key={msg.id}
+            className={`p-2 rounded-lg w-fit max-w-[70%] ${
               msg.sender === currentUser.uid
                 ? "bg-pink-500 text-white ml-auto"
                 : "bg-white"
@@ -78,7 +97,7 @@ function Chat() {
 
         <button
           onClick={handleSend}
-          className="bg-pink-600 text-white px-4 py-2 rounded"
+          className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700"
         >
           Send
         </button>

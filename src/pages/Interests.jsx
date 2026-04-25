@@ -1,88 +1,126 @@
 import { useEffect, useState } from "react";
 import { db, auth } from "../firebase";
-import { collection, getDocs } from "firebase/firestore";
-import { doc, deleteDoc, setDoc } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+  doc,
+  deleteDoc,
+  setDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 
 function Interests() {
   const [requests, setRequests] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false);
 
+  const currentUser = auth.currentUser;
+
+  // 🔥 REAL-TIME FETCH (ONLY YOUR INTERESTS)
   useEffect(() => {
-    const fetchInterests = async () => {
-      const currentUser = auth.currentUser;
+    if (!currentUser) return;
 
-      const snapshot = await getDocs(collection(db, "interests"));
+    const q = query(
+      collection(db, "interests"),
+      where("to", "==", currentUser.uid)
+    );
 
-      const data = snapshot.docs
-        .map((doc) => doc.data())
-        .filter((item) => item.to === currentUser.uid);
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id, // ✅ important
+          ...doc.data(),
+        }));
 
-      setRequests(data);
-    };
+        setRequests(data);
+      },
+      (error) => {
+        console.error("Fetch error:", error);
+      }
+    );
 
-    fetchInterests();
-  }, []);
-  
-   const handleAccept = async (item) => {
-  const currentUser = auth.currentUser;
+    return unsubscribe;
+  }, [currentUser]);
 
-  try {
-    // 🔥 create match
-    await setDoc(doc(db, "matches", currentUser.uid + "_" + item.from), {
-      users: [currentUser.uid, item.from],
-    });
+  // 💖 ACCEPT
+  const handleAccept = async (item) => {
+    if (!currentUser || isProcessing) return;
 
-    // 🔥 delete interest
-    await deleteDoc(doc(db, "interests", item.from + "_" + currentUser.uid));
+    try {
+      setIsProcessing(true);
 
-    alert("Match Created 💖");
+      // 🔥 UNIQUE MATCH ID (FIXED)
+      const matchId = [currentUser.uid, item.from].sort().join("_");
 
-    // 🔥 update UI
-    setRequests((prev) => prev.filter((r) => r.from !== item.from));
-  } catch (err) {
-    console.error(err);
-  }
-};
+      await setDoc(doc(db, "matches", matchId), {
+        users: [currentUser.uid, item.from],
+        createdAt: serverTimestamp(),
+      });
 
-const handleReject = async (item) => {
-  const currentUser = auth.currentUser;
+      // ❌ delete interest
+      await deleteDoc(doc(db, "interests", item.id));
 
-  try {
-    await deleteDoc(doc(db, "interests", item.from + "_" + currentUser.uid));
+      alert("Match Created 💖");
+    } catch (err) {
+      console.error("Accept error:", err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
-    alert("Rejected ❌");
+  // ❌ REJECT
+  const handleReject = async (item) => {
+    if (!currentUser || isProcessing) return;
 
-    // 🔥 update UI
-    setRequests((prev) => prev.filter((r) => r.from !== item.from));
-  } catch (err) {
-    console.error(err);
-  }
-};
+    try {
+      setIsProcessing(true);
+
+      await deleteDoc(doc(db, "interests", item.id));
+
+      alert("Rejected ❌");
+    } catch (err) {
+      console.error("Reject error:", err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">💖 Received Interests</h1>
+      <h1 className="text-2xl font-bold mb-6">
+        💖 Received Interests
+      </h1>
 
       {requests.length === 0 ? (
         <p>No interests yet</p>
       ) : (
-        requests.map((item, index) => (
-          <div key={index} className="border p-4 mb-3 rounded">
-            <p>From User ID: {item.from}</p>
+        requests.map((item) => (
+          <div
+            key={item.id}
+            className="border p-4 mb-3 rounded-lg shadow-sm"
+          >
+            <p className="text-sm text-gray-600">
+              From User ID: {item.from}
+            </p>
 
-            <div className="mt-2 flex gap-2">
+            <div className="mt-3 flex gap-2">
               <button
-  onClick={() => handleAccept(item)}
-  className="bg-green-500 text-white px-4 py-1 rounded"
->
-  Accept
-</button>
+                onClick={() => handleAccept(item)}
+                disabled={isProcessing}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded"
+              >
+                Accept
+              </button>
 
-<button
-  onClick={() => handleReject(item)}
-  className="bg-red-500 text-white px-4 py-1 rounded"
->
-  Reject
-</button>
+              <button
+                onClick={() => handleReject(item)}
+                disabled={isProcessing}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded"
+              >
+                Reject
+              </button>
             </div>
           </div>
         ))
